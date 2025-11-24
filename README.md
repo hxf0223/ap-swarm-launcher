@@ -22,6 +22,13 @@ these steps:
 
 Tested on Linux and macOS. May or may not work on Windows.
 
+## 运行示例
+
+```bash
+# 启动一个 ArduPlane SITL 实例，位置在中国合肥
+uv run ap-sitl-swarm --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 ~/tmp/arduplane/arduplane
+```
+
 ## License
 
 Copyright 2022-2024 CollMot Robotics Ltd.
