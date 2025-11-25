@@ -6,6 +6,7 @@ from contextlib import (
     asynccontextmanager,
     closing,
 )
+from dataclasses import dataclass
 from functools import lru_cache
 from importlib.resources import path as resource_path
 from itertools import count
@@ -39,7 +40,19 @@ from .utils import copy_file_async, maybe_temporary_working_directory
 __all__ = (
     "SimulatedDroneSwarm",
     "SimulatedDroneSwarmContext",
+    "FollowSettings",
 )
+
+
+@dataclass(frozen=True)
+class FollowSettings:
+    """Configuration for enabling follow-the-leader behavior."""
+
+    leader_sysid: int
+    offset_x: float = -10.0
+    offset_y: float = -10.0
+    offset_type: int = 1
+    dist_max: float = 1000.0
 
 
 _uart_id_to_index_map: dict[str, int] = {
@@ -271,6 +284,7 @@ class SimulatedDroneSwarm:
         serial_port: Optional[str] = None,
         model: Optional[str] = None,
         start_system_id: int = 1,
+        follow_settings: Optional[FollowSettings] = None,
     ):
         """Constructor.
 
@@ -322,6 +336,7 @@ class SimulatedDroneSwarm:
         self._gcs_address = gcs_address
         self._multicast_address = multicast_address
         self._model = model
+        self._follow_settings = follow_settings
 
         self._index_generator = count(start_system_id)
 
@@ -414,7 +429,7 @@ class SimulatedDroneSwarm:
 
         own_param_file = drone_dir / "default.param"
 
-        tcp_port = self._tcp_base_port + index - 1 if self._tcp_base_port else None
+        tcp_port = self._tcp_base_port + (index - 1)*10 if self._tcp_base_port else None
 
         # Determine where the UDP status packets should be sent. If we have a
         # GCS address, send them there. If we don't, but we need to aggregate
@@ -424,6 +439,11 @@ class SimulatedDroneSwarm:
         primary_udp_output = self._get_primary_udp_output_address()
 
         await AsyncPath(drone_dir).mkdir(parents=True, exist_ok=True)  # type: ignore
+        print(f"Starting simulated drone {index} at home {geodetic_home} "
+              f"with heading {heading}°")
+        print(f"  Parameters from: {self._params}")
+        print(f"  Parameter file: {own_param_file}")
+        print(f"  Filesystem dir: {drone_fs_dir}")
 
         async with await open_file(own_param_file, "wb+") as fp:
             for param_source in self._params:
@@ -448,7 +468,7 @@ class SimulatedDroneSwarm:
 
             # TODO(ntamas): from ArduPilot 4.7, this will probably be
             # MAV_SYSID instead
-            await fp.write(f"SYSID_THISMAV\t{index}\n".encode("utf-8"))
+            await fp.write(f"MAV_SYSID\t{index}\n".encode("utf-8"))
 
             if primary_udp_output:
                 # We need the first serial port for primary telemetry
@@ -465,6 +485,16 @@ class SimulatedDroneSwarm:
                 # We also need a serial port for receiving direct traffic from
                 # the TCP port associated to the UAV.
                 await fp.write("SERIAL0_PROTOCOL\t2\n".encode("utf-8"))
+
+            if self._follow_settings:
+                leader_sysid = self._follow_settings.leader_sysid
+                if index != leader_sysid:
+                    await fp.write("FOLL_ENABLE\t1\n".encode("utf-8"))
+                    await fp.write(f"FOLL_OFS_X\t{self._follow_settings.offset_x}\n".encode("utf-8"))
+                    await fp.write(f"FOLL_OFS_Y\t{self._follow_settings.offset_y}\n".encode("utf-8"))
+                    await fp.write(f"FOLL_OFS_TYPE\t{self._follow_settings.offset_type}\n".encode("utf-8"))
+                    await fp.write(f"FOLL_SYSID\t{leader_sysid}\n".encode("utf-8"))
+                    await fp.write(f"FOLL_DIST_MAX\t{self._follow_settings.dist_max}\n".encode("utf-8"))
 
         await AsyncPath(drone_fs_dir).mkdir(parents=True, exist_ok=True)  # type: ignore
 

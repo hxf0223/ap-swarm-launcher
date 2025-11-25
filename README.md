@@ -27,12 +27,20 @@ Tested on Linux and macOS. May or may not work on Windows.
 ```bash
 # 启动一个 ArduPlane SITL 实例，位置在中国合肥
 uv run ap-sitl-swarm --model plane --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 ~/tmp/arduplane/arduplane
+
+# 启动两个 ArduPlane SITL 实例，设置数据目录为 ~/tmp/arduplane
+uv run ap-sitl-swarm --model plane -n 2 --data-dir ~/tmp/arduplane --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 ~/tmp/arduplane/arduplane
+
+# 让除 1 号之外的所有无人机跟随 1 号机器（FOLL_SYSID = 1）
+uv run ap-sitl-swarm --model plane -n 2 --data-dir ~/tmp/arduplane --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 --follow --follow-leader 1 ~/tmp/arduplane/arduplane
 ```
 
-## 其他参考 SITL 脚本
+## 其他参考 SITL 脚本及文档
 
 * [sitl-cli](https://github.com/iWaheeb/sitl-cli)
 * [pymavlink-examples](https://github.com/peakyquest/pymavlink-examples)
+* [ArduPilot Follow Mode](https://ardupilot.org/copter/docs/follow-mode.html)
+* [ArduPilot Follow Example Script](https://github.com/ArduPilot/ardupilot/blob/master/libraries/SITL/examples/Follow/plane_quad.sh)
 
 ## License
 
