@@ -26,8 +26,13 @@ Tested on Linux and macOS. May or may not work on Windows.
 
 ```bash
 # 启动一个 ArduPlane SITL 实例，位置在中国合肥
-uv run ap-sitl-swarm --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 ~/tmp/arduplane/arduplane
+uv run ap-sitl-swarm --model plane --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 ~/tmp/arduplane/arduplane
 ```
+
+## 其他参考 SITL 脚本
+
+* [sitl-cli](https://github.com/iWaheeb/sitl-cli)
+* [pymavlink-examples](https://github.com/peakyquest/pymavlink-examples)
 
 ## License
 
