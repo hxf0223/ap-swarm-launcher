@@ -14,6 +14,7 @@ from ap_swarm_launcher.locations import (
     LocationDefinition,
     parse_location,
 )
+from ap_swarm_launcher.model_params import get_default_params_for_model
 from ap_swarm_launcher.sitl import FollowSettings, SimulatedDroneSwarm
 from ap_swarm_launcher.utils import route_local_broadcast_traffic_to_multicast
 
@@ -212,11 +213,9 @@ async def run(
 
     grid = create_grid_formation(num_drones_per_row, spacing, pos_noise)
 
-    param_sources: List[Union[Path, str, Tuple[str, float]]] = [
-        #"embedded://copter-default.parm",
-        #"embedded://copter-skybrush.parm",
-        "embedded://plane-default.parm"
-    ]
+    param_sources: List[Union[Path, str, Tuple[str, float]]] = (
+        get_default_params_for_model(model)
+    )
     param_sources.extend(param)
 
     async with SimulatedDroneSwarm(

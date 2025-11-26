@@ -35,12 +35,19 @@ uv run ap-sitl-swarm --model plane -n 2 --data-dir ~/tmp/arduplane --no-multicas
 uv run ap-sitl-swarm --model plane -n 2 --data-dir ~/tmp/arduplane --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 --follow --follow-leader 1 ~/tmp/arduplane/arduplane
 ```
 
+* 默认参数文件`parm`来自`ArduPilot`源码：
+  * `Tools/autotest/default_params/copter.parm`；
+  * `Tools/autotest/models/plane.parm`；
+* `follow`功能实现代码：`libraries/AP_Follow/AP_Follow.cpp`。固定翼没有`Follow`功能，比如`copter`的跟随相关代码：
+  * `libraries/AP_Follow/AP_Follow.cpp`；
+
 ## 其他参考 SITL 脚本及文档
 
 * [sitl-cli](https://github.com/iWaheeb/sitl-cli)
 * [pymavlink-examples](https://github.com/peakyquest/pymavlink-examples)
 * [ArduPilot Follow Mode](https://ardupilot.org/copter/docs/follow-mode.html)
 * [ArduPilot Follow Example Script](https://github.com/ArduPilot/ardupilot/blob/master/libraries/SITL/examples/Follow/plane_quad.sh)
+* [github -- ArduPilot Gazebo Plugin](https://github.com/ArduPilot/ardupilot_gazebo)
 
 ## License
 

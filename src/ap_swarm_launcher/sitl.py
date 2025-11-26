@@ -390,9 +390,7 @@ class SimulatedDroneSwarm:
         return (
             self._gcs_address
             if self._gcs_address
-            else "127.0.0.1:14550"
-            if self._serial_port
-            else None
+            else "127.0.0.1:14550" if self._serial_port else None
         )
 
     def _request_stop(self):
@@ -429,7 +427,9 @@ class SimulatedDroneSwarm:
 
         own_param_file = drone_dir / "default.param"
 
-        tcp_port = self._tcp_base_port + (index - 1)*10 if self._tcp_base_port else None
+        tcp_port = (
+            self._tcp_base_port + (index - 1) * 10 if self._tcp_base_port else None
+        )
 
         # Determine where the UDP status packets should be sent. If we have a
         # GCS address, send them there. If we don't, but we need to aggregate
@@ -439,8 +439,10 @@ class SimulatedDroneSwarm:
         primary_udp_output = self._get_primary_udp_output_address()
 
         await AsyncPath(drone_dir).mkdir(parents=True, exist_ok=True)  # type: ignore
-        print(f"Starting simulated drone {index} at home {geodetic_home} "
-              f"with heading {heading}°")
+        print(
+            f"Starting simulated drone {index} at home {geodetic_home} "
+            f"with heading {heading}°"
+        )
         print(f"  Parameters from: {self._params}")
         print(f"  Parameter file: {own_param_file}")
         print(f"  Filesystem dir: {drone_fs_dir}")
@@ -478,8 +480,9 @@ class SimulatedDroneSwarm:
                 # We need a second serial port for receiving multicast traffic
                 # (which is used to simulate broadcast). At the same time, we
                 # disable MAVLink forwarding to/from this port
-                await fp.write("SERIAL2_PROTOCOL\t2\n".encode("utf-8"))
-                await fp.write("SERIAL2_OPTIONS\t1024\n".encode("utf-8"))
+                # await fp.write("SERIAL2_PROTOCOL\t2\n".encode("utf-8"))
+                # await fp.write("SERIAL2_OPTIONS\t1024\n".encode("utf-8"))
+                pass
 
             if tcp_port:
                 # We also need a serial port for receiving direct traffic from
@@ -490,11 +493,27 @@ class SimulatedDroneSwarm:
                 leader_sysid = self._follow_settings.leader_sysid
                 if index != leader_sysid:
                     await fp.write("FOLL_ENABLE\t1\n".encode("utf-8"))
-                    await fp.write(f"FOLL_OFS_X\t{self._follow_settings.offset_x}\n".encode("utf-8"))
-                    await fp.write(f"FOLL_OFS_Y\t{self._follow_settings.offset_y}\n".encode("utf-8"))
-                    await fp.write(f"FOLL_OFS_TYPE\t{self._follow_settings.offset_type}\n".encode("utf-8"))
+                    await fp.write(
+                        f"FOLL_OFS_X\t{self._follow_settings.offset_x}\n".encode(
+                            "utf-8"
+                        )
+                    )
+                    await fp.write(
+                        f"FOLL_OFS_Y\t{self._follow_settings.offset_y}\n".encode(
+                            "utf-8"
+                        )
+                    )
+                    await fp.write(
+                        f"FOLL_OFS_TYPE\t{self._follow_settings.offset_type}\n".encode(
+                            "utf-8"
+                        )
+                    )
                     await fp.write(f"FOLL_SYSID\t{leader_sysid}\n".encode("utf-8"))
-                    await fp.write(f"FOLL_DIST_MAX\t{self._follow_settings.dist_max}\n".encode("utf-8"))
+                    await fp.write(
+                        f"FOLL_DIST_MAX\t{self._follow_settings.dist_max}\n".encode(
+                            "utf-8"
+                        )
+                    )
 
         await AsyncPath(drone_fs_dir).mkdir(parents=True, exist_ok=True)  # type: ignore
 
