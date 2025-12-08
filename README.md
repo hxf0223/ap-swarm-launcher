@@ -26,12 +26,8 @@ cat > ~/.config/uv/uv.toml <<EOF
 ```bash
 # ~/.config/uv/uv.toml
 
-[global]
 # 全局缓存目录
 cache-dir = "~/.cache/uv"
-
-# Python虚拟环境目录
-venv-dir = "~/.local/share/uv/venvs"
 
 # 索引配置
 [[index]]
@@ -59,13 +55,13 @@ default = false
 uv sync
 
 # 启动一个 ArduPlane SITL 实例，位置在中国合肥
-uv run ap-sitl-swarm --model plane --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 ~/tmp/arduplane/arduplane
+uv run ap-sitl-swarm --model plane --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 ~/tmp/ardu/arduplane
 
-# 启动两个 ArduPlane SITL 实例，设置数据目录为 ~/tmp/arduplane
-uv run ap-sitl-swarm --model plane -n 2 --data-dir ~/tmp/arduplane --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 ~/tmp/arduplane/arduplane
-
+# 启动两个 ArduPlane SITL 实例，设置数据目录为 ~/tmp/ardu
+uv run ap-sitl-swarm --model plane -n 2 --data-dir ~/tmp/ardu --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 ~/tmp/ardu/arduplane
+  
 # 让除 1 号之外的所有无人机跟随 1 号机器（FOLL_SYSID = 1）
-uv run ap-sitl-swarm --model plane -n 2 --data-dir ~/tmp/arduplane --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 --follow --follow-leader 1 ~/tmp/arduplane/arduplane
+uv run ap-sitl-swarm --model plane -n 2 --data-dir ~/tmp/ardu --no-multicast --tcp-base-port 5760 --home 31.8269,117.2280,30 --follow --follow-leader 1 ~/tmp/ardu/arduplane
 ```
 
 * 默认参数文件`parm`来自`ArduPilot`源码：
